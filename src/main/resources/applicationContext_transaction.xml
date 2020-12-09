@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+		<!-- 事务核心管理器 -->
+		<bean name="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+			<property name="dataSource" ref="dataSource"/>
+		</bean>
+
+
+
+	<!--配置事务增强，事务如何切入  -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<!-- 所有方法都是事务方法 -->
+			<tx:method name="*"/>
+			<!--以get开始的所有方法  -->
+			<tx:method name="get*" read-only="true"/>
+		</tx:attributes>
+	</tx:advice>
+
+	<!--开启基于注解的事务，使用xml配置形式的事务（必要主要的都是使用配置式）  -->
+	<aop:config>
+		<!-- 切入点表达式 -->
+		<aop:pointcut expression="execution(* com.service..*(..))" id="txPoint"/>
+		<!-- 配置事务增强 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPoint"/>
+	</aop:config>
+
+
+
+
+
+		
+		<!-- 开启注解事务 -->		
+		<tx:annotation-driven transaction-manager="transactionManager"/>
+		
+</beans>
